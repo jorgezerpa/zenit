@@ -10,6 +10,28 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --animate-hero1: hero1 .5s ease-in-out infinite;
+  @keyframes hero1 {
+    0%,
+    100% {
+      transform: scaleY(0);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
+  --animate-hero2: hero2 .5s ease-in-out infinite;
+  @keyframes hero2 {
+    0%,
+    100% {
+      transform: scaleX(0);
+    }
+    50% {
+      transform: scaleX(1);
+    }
+  }
+
 }
 
 @media (prefers-color-scheme: dark) {
