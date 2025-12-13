@@ -16,7 +16,7 @@ export default function Home() {
       <TopBar />
       
       {/* hero */}
-      {/* <Hero /> */}
+      <Hero />
       <Shipping />
 
       {/* Products header */}

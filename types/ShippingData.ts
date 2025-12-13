@@ -1,6 +1,6 @@
 export type ShippingData = {
     state: string;
     municipality: string;
-    agencyNumber: string;
+    agencyAddress: string;
     method: "zoom"|"mrw";
 }

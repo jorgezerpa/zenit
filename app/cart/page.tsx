@@ -15,6 +15,7 @@ import { TransferenciaBanesco } from "@/components/paymentMethods/TransferenciaB
 import { Binance } from "@/components/paymentMethods/Binance";
 //
 import { supabase } from "@/lib/supabase";
+import { error } from "console";
 
 enum PaymentMethods {
   PagoMovil,
@@ -29,11 +30,474 @@ enum ShippingMethods {
   ZOOM
 }
 
+// Constants 
+const STATES = [
+  { 
+    name: "Amazonas", 
+    municipalities: [
+      "Alto Orinoco",
+      "Atabapo",
+      "Atures",
+      "Autana",
+      "Manapiare",
+      "Maroa",
+      "Río Negro"
+    ] 
+  },
+  { 
+    name: "Anzoátegui", 
+    municipalities: [
+      "Anaco",
+      "Aragua",
+      "Bolívar",
+      "Bruzual",
+      "Cajigal",
+      "Carvajal",
+      "Diego Bautista Urbaneja",
+      "Freites",
+      "Guanta",
+      "Guanipa",
+      "Independencia",
+      "Libertad",
+      "McGregor",
+      "Miranda",
+      "Monagas",
+      "Peñalver",
+      "Píritu",
+      "San Juan de Capistrano",
+      "Santa Ana",
+      "Simón Rodríguez",
+      "Sotillo"
+    ] 
+  },
+  { 
+    name: "Apure", 
+    municipalities: [
+      "Achaguas",
+      "Biruaca",
+      "Muñoz",
+      "Páez",
+      "Pedro Camejo",
+      "Rómulo Gallegos",
+      "San Fernando"
+    ] 
+  },
+  { 
+    name: "Aragua", 
+    municipalities: [
+    "Bolívar",
+    "Camatagua",
+    "Francisco Linares Alcántara",
+    "Girardot",
+    "José Ángel Lamas",
+    "José Félix Ribas",
+    "José Rafael Revenga",
+    "Libertador",
+    "Mario Briceño Iragorry",
+    "Ocumare de la Costa de Oro",
+    "San Casimiro",
+    "San Sebastián",
+    "Santiago Mariño",
+    "Santos Michelena",
+    "Sucre",
+    "Tovar",
+    "Urdaneta",
+    "Zamora"
+    ] 
+  },
+  { 
+    name: "Barinas", 
+    municipalities: [
+      "Alberto Arvelo Torrealba",
+      "Andrés Eloy Blanco",
+      "Antonio José de Sucre",
+      "Arismendi",
+      "Barinas",
+      "Bolívar",
+      "Cruz Paredes",
+      "Ezequiel Zamora",
+      "Obispos",
+      "Pedraza",
+      "Rojas",
+      "Sosa"
+    ] 
+  },
+  { 
+    name: "Bolívar", 
+    municipalities: [
+      "Angostura", // Anteriormente Raúl Leoni
+      "Angostura del Orinoco", // Anteriormente Heres (donde está Ciudad Bolívar)
+      "Caroní", // Donde están Ciudad Guayana y Puerto Ordaz
+      "Cedeño",
+      "El Callao",
+      "Gran Sabana",
+      "Padre Pedro Chien",
+      "Piar",
+      "Roscio",
+      "Sifontes",
+      "Sucre"
+    ] 
+  },
+  { 
+    name: "Carabobo", 
+    municipalities: [
+      "Bejuma",
+      "Carlos Arvelo",
+      "Diego Ibarra",
+      "Guacara",
+      "Juan José Mora",
+      "Libertador",
+      "Los Guayos",
+      "Miranda",
+      "Montalbán",
+      "Naguanagua",
+      "Puerto Cabello",
+      "San Diego",
+      "San Joaquín",
+      "Valencia" // Capital del estado
+    ] 
+  },
+  { 
+    name: "Cojedes", 
+    municipalities: [
+      "Anzoátegui",
+      "Falcón",
+      "Girardot",
+      "Lima Blanco",
+      "Pao de San Juan Bautista",
+      "Ricaurte",
+      "Rómulo Gallegos",
+      "San Carlos", // Capital del estado
+      "Tinaco"
+    ] 
+  },
+  { 
+    name: "Delta Amacuro", 
+    municipalities: [
+      "Antonio Díaz",
+      "Casacoima",
+      "Pedernales",
+      "Tucupita" // Capital del estado
+    ] 
+  },
+  { 
+    name: "Distrito Capital", 
+    municipalities: [
+      "Libertador"
+    ] 
+  }, 
+  { 
+    name: "Falcón", 
+    municipalities: [
+      "Acosta",
+      "Bolívar",
+      "Buchivacoa",
+      "Cacique Manaure",
+      "Carirubana",
+      "Colina",
+      "Dabajuro",
+      "Democracia",
+      "Falcón",
+      "Federación",
+      "Iturriza",
+      "Jacura",
+      "Los Taques",
+      "Mauroa",
+      "Miranda", // Capital del estado (Coro)
+      "Monseñor Iturriza",
+      "Palma Sola",
+      "Petit",
+      "Píritu",
+      "San Francisco",
+      "Silva",
+      "Sucre",
+      "Tocópero",
+      "Unión",
+      "Zamora"
+    ] 
+  },
+  { 
+    name: "Guárico", 
+    municipalities: [
+      "Camaguán",
+      "Chaguaramas",
+      "El Socorro",
+      "Francisco de Miranda",
+      "José Félix Ribas",
+      "José Tadeo Monagas",
+      "Juan Germán Roscio", // Capital del estado (San Juan de los Morros)
+      "Julián Mellado",
+      "Las Mercedes",
+      "Leonardo Infante",
+      "Ortiz",
+      "Pedro Zaraza",
+      "San Gerónimo de Guayabal",
+      "San José de Guaribe",
+      "Santa María de Ipire"
+
+    ] 
+  },
+  { 
+    name: "La Guaira", 
+    municipalities: [
+      "Vargas"
+    ] 
+  }, // Anteriormente Vargas
+  { 
+    name: "Lara", 
+    municipalities: [
+      "Andrés Eloy Blanco",
+      "Crespo",
+      "Iribarren", // Capital del estado (Barquisimeto)
+      "Jiménez",
+      "Lara",
+      "Morán",
+      "Palavecino",
+      "Simón Planas",
+      "Torres"
+    ] 
+  },
+  { 
+    name: "Mérida", 
+    municipalities: [
+      "Alberto Adriani",
+      "Andrés Bello",
+      "Antonio Pinto Salinas",
+      "Aricagua",
+      "Campo Elías", // Capital del estado (Mérida)
+      "Caracciolo Parra Olmedo",
+      "Cardenal Quintero",
+      "Guaraque",
+      "Julio César Salas",
+      "Justo Briceño",
+      "Libertador",
+      "Miranda",
+      "Obispo Ramos de Lora",
+      "Padre Noguera",
+      "Pueblo Llano",
+      "Rangel",
+      "Rivas Dávila",
+      "Santos Marquina",
+      "Sucre",
+      "Tovar",
+      "Tulio Febres Cordero",
+      "Zea",
+      "Arapuey" // Municipio más reciente
+    ] 
+  },
+  { 
+    name: "Miranda", 
+    municipalities: [
+      "Acevedo",
+      "Andrés Bello",
+      "Baruta",
+      "Brión",
+      "Buroz",
+      "Carrizal",
+      "Chacao",
+      "Cristóbal Rojas",
+      "El Hatillo",
+      "Guaicaipuro", // Capital del estado (Los Teques)
+      "Independencia",
+      "Lander",
+      "Los Salias",
+      "Páez",
+      "Paz Castillo",
+      "Pedro Gual",
+      "Plaza",
+      "Simón Bolívar",
+      "Sucre",
+      "Urdaneta",
+      "Zamora"
+    ] 
+  },
+  { 
+    name: "Monagas", 
+    municipalities: [
+      "Acosta",
+      "Aguasay",
+      "Bolívar",
+      "Caripe",
+      "Cedeño",
+      "Ezequiel Zamora",
+      "Libertador",
+      "Piar",
+      "Punceres",
+      "Santa Bárbara",
+      "Sotillo",
+      "Uracoa",
+      "Maturín" // Capital del estado
+    ] 
+  },
+  { 
+    name: "Nueva Esparta", 
+    municipalities: [
+      "Antolín del Campo",
+      "Arismendi", // Capital del estado (La Asunción)
+      "García",
+      "Gómez",
+      "Maneiro",
+      "Marcano",
+      "Mariño", // Donde se encuentra Porlamar, el centro comercial
+      "Península de Macanao",
+      "Tubores",
+      "Villalba",
+      "Díaz"
+    ] 
+  },
+  { 
+    name: "Portuguesa", 
+    municipalities: [
+      "Agua Blanca",
+      "Araure",
+      "Esteller",
+      "Guanare", // Capital del estado
+      "Guanarito",
+      "Monseñor José Vicente de Unda",
+      "Ospino",
+      "Páez",
+      "Papelón",
+      "San Genaro de Boconoito",
+      "San Rafael de Onoto",
+      "Santa Rosalía",
+      "Sucre",
+      "Turén"
+    ] 
+  },
+  { 
+    name: "Sucre", 
+    municipalities: [
+      "Andrés Eloy Blanco",
+      "Andrés Mata",
+      "Arismendi",
+      "Benítez",
+      "Bermúdez", // Donde se encuentra Carúpano
+      "Bolívar",
+      "Cajigal",
+      "Cruz Salmerón Acosta",
+      "Libertador",
+      "Mariño",
+      "Mejía",
+      "Montes",
+      "Ribero",
+      "Sucre", // Capital del estado (Cumaná)
+      "Valdez"
+    ] 
+  },
+  { 
+    name: "Táchira", 
+    municipalities: [
+      "Andrés Bello",
+      "Antonio Rómulo Costa",
+      "Ayacucho",
+      "Bolívar",
+      "Cárdenas",
+      "Córdoba",
+      "Fernández Feo",
+      "Francisco de Miranda",
+      "García de Hevia",
+      "Guásimos",
+      "Independencia",
+      "Jáuregui",
+      "José María Vargas",
+      "Junín",
+      "Libertad",
+      "Libertador",
+      "Lobatera",
+      "Michelena",
+      "Panamericano",
+      "Pedro María Ureña",
+      "Rafael Urdaneta",
+      "Samuel Darío Maldonado",
+      "San Cristóbal", // Capital del estado
+      "San Judas Tadeo",
+      "Seboruco",
+      "Simón Rodríguez",
+      "Sucre",
+      "Torbes",
+      "Uribante"
+    ] 
+  },
+  { 
+    name: "Trujillo", 
+    municipalities: [
+      "Andrés Bello",
+      "Boconó",
+      "Bolívar",
+      "Candelaria",
+      "Carache",
+      "Escuque",
+      "José Felipe Márquez Cañizalez",
+      "Juan Vicente Campo Elías",
+      "La Ceiba",
+      "Miranda",
+      "Monte Carmelo",
+      "Motatán",
+      "Pampán",
+      "Pampanito",
+      "Rafael Rangel",
+      "San Rafael de Carvajal",
+      "Sucre",
+      "Trujillo", // Capital del estado
+      "Urdaneta",
+      "Valera"
+    ] 
+  },
+  { 
+    name: "Yaracuy", 
+    municipalities: [
+      "Aristides Bastidas",
+      "Bolívar",
+      "Bruzual",
+      "Cocorote",
+      "Independencia",
+      "José Antonio Páez",
+      "La Trinidad",
+      "Manuel Monge",
+      "Nirgua",
+      "Peña",
+      "San Felipe", // Capital del estado
+      "Sucre",
+      "Urachiche",
+      "Veroes"
+    ] 
+  },
+  { 
+    name: "Zulia", 
+    municipalities: [
+      "Almirante Padilla",
+      "Baralt",
+      "Cabimas",
+      "Catatumbo",
+      "Colón",
+      "Francisco Javier Pulgar",
+      "Jesús Enrique Lossada",
+      "Jesús María Semprún",
+      "La Cañada de Urdaneta",
+      "Lagunillas",
+      "Machiques de Perijá",
+      "Mara",
+      "Maracaibo", // Capital del estado
+      "Miranda",
+      "Páez",
+      "Rosario de Perijá",
+      "San Francisco",
+      "Santa Rita",
+      "Simón Bolívar",
+      "Sucre",
+      "Valmore Rodríguez"
+    ] 
+  }
+];
+
+
+
 // Define a common style for inputs for better visual consistency
 const inputClasses = "w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow mb-3";
+const errorClasses = "border-red-500 focus:ring-red-500";
 
 export default function Cart() {
-
+  const router = useRouter();
   const cartStore = useCartStore()
   const productsStore = useProductsStore()
   const shippingStore = useShippingStore()
@@ -42,6 +506,20 @@ export default function Cart() {
   const [contactData, setContactData] = useState<{ name:string, phone: string }>({ name:"", phone: "" })
   const [selectedShippingMode, setSelectedShippingMode] = useState<ShippingMethods|null>(null)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethods|null>(null)
+
+  // error handling and sanitization
+  const [errors, setErrors] = useState({
+    name: '',
+    phone: '',
+    shippingMethod: '',
+    shippingState: '',
+    shippingMunicipality: '',
+    shippingAgencyAddress: '',
+    paymentMethod: '',
+    paymentProof: '',
+    products: '',  
+    total: '', // total to pay
+  })
 
   useEffect(()=>{
     cartStore.initialLoad()
@@ -123,13 +601,32 @@ export default function Cart() {
   }
 
   const handleBuy = async () => {
+    let errors = {
+      name: '',
+      phone: '',
+      shippingMethod: '',
+      shippingState: '',
+      shippingMunicipality: '',
+      shippingAgencyAddress: '',
+      paymentMethod: '',
+      paymentProof: '',
+      products: '',  
+      total: '', // total to pay
+    };
+
     // 1. **Prepare Data**
     const paymentProofFile = paymentProofRef.current?.files?.[0];
   
     if (!paymentProofFile) {
-      console.error("Missing payment proof file.");
-      // TODO: Add user-facing error handling (toast, alert, etc.)
-      return; 
+      errors.paymentProof = "Por favor, sube el comprobante de pago.";
+    }
+    
+    if (paymentProofFile) {
+      const allowedExtensions = ['png', 'jpeg', 'jpg'];
+      const fileExtension = paymentProofFile.name.split('.').pop()?.toLowerCase();
+      if (!fileExtension || !allowedExtensions.includes(fileExtension)) {
+        errors.paymentProof = "Formato de archivo invalido. Solo se permiten png, jpeg, jpg.";
+      }
     }
 
     // Combine basic data
@@ -138,7 +635,7 @@ export default function Cart() {
       shipping: {
         method: selectedShippingMode !== null ? ShippingMethods[selectedShippingMode] : null,
         deliveryDays: calculateDeliveryDays(),
-        specificData: shippingStore.shippingData,
+        specificData: shippingStore.shippingData, // state: string; municipality: string; agencyNumber: string; method: "zoom" | "mrw";
       },
       payment: {
         method: selectedPaymentMethod !== null ? PaymentMethods[selectedPaymentMethod] : null,
@@ -146,6 +643,55 @@ export default function Cart() {
       items: cartStore.products, // We will use this array to insert into order_items
       total: Number(calculateTotal()),
     };
+
+    // Input validation 
+    // name -> Max 50 chars
+    // phone -> starts with any of 0414,0424,0416,0426,0412,0422 and has 7 numbers after such prefixes
+    // shippingMethod -> should be "mrw" or "zoom"
+    // shippingState -> Any of the 23 states or distrit capital of venezuela  
+    // shippingMunicipality -> correspondant municipality for the selected state,
+    // shippingAgencyAddress: -> string,
+    // paymentMethod -> "pagoMovil", "transferenciaProvincial", etc al listed
+    // paymentProof: -> Image, check extension to be "png, jpeg, jpg"
+    // products -> length of the list of at least 1 product and check for no repeated  
+    // total -> number more than 0 and should be the sum of the products 
+    if (checkoutData.contact.name.length < 5) errors.name = "El nombre ingresado es muy corto (minimo 5 caracteres)";
+    if (checkoutData.contact.name.length > 50) errors.name = "El nombre ingresado es muy largo (maximo 50 caracteres)";
+    if (!/^0(414|424|416|426|412|422)\d{7}$/.test(checkoutData.contact.phone)) errors.phone = "El número de teléfono ingresado no es válido.";
+    if (!checkoutData.shipping.method || !(checkoutData.shipping.method === "MRW" || checkoutData.shipping.method === "ZOOM")) errors.shippingMethod = "Método de envío no existente";
+    if (!checkoutData.payment.method || !Object.values(PaymentMethods).includes(checkoutData.payment.method)) errors.paymentMethod = "Método de pago no existente";
+    if (checkoutData.items.length === 0) errors.products = "No hay productos en el carrito.";
+    // if (checkoutData.total <= 0) setErrors(prev => ({ ...prev, total: "No se puede hacer una orden con 0$ " }));
+    //
+    if (checkoutData.shipping.method && checkoutData.shipping.specificData) {
+      const { state, municipality, agencyAddress } = checkoutData.shipping.specificData;
+      // Validate state
+      if (!STATES.some(s => s.name === state)) {
+        errors.shippingState = "Seleccione un estado de la lista";
+      } else {
+        // Validate municipality
+        const stateObj = STATES.find(s => s.name === state);
+        if (stateObj && !stateObj.municipalities.includes(municipality)) {
+          errors.shippingMunicipality = "Seleccione un municipio de la lista";
+        }
+      }
+      // Validate agency address
+      if (!agencyAddress || agencyAddress.trim().length === 0) {
+        errors.shippingAgencyAddress = "Ingrese una direccion de envio valida";
+      }
+    } else if(checkoutData.shipping.method && !checkoutData.shipping.specificData) {
+      errors.shippingState = "Seleccione un estado de la lista";
+      errors.shippingMunicipality = "Seleccione un municipio de la lista";
+      errors.shippingAgencyAddress = "Ingrese una direccion de envio valida";
+    }
+
+    
+    // If any errors, stop the process
+    if (Object.values(errors).some(error => error) || !paymentProofFile) {
+      setErrors(errors);
+      console.log("Validation errors:", errors);
+      return;
+    }
 
     // 2. **Upload Payment Proof to Storage**
       let paymentProofUrl = null;
@@ -211,6 +757,11 @@ export default function Cart() {
       const newOrderId = orderData.id;
       // 4. SUCCESS
       console.log("Checkout successful. Order ID:", newOrderId);
+
+      // 5 . Clear cart and shipping data and redirect to thanks page
+      cartStore.clear();
+      shippingStore.clearShippingData();
+      router.push(`/thank-you`);
   } 
       
 
@@ -300,24 +851,28 @@ export default function Cart() {
                 name="name" 
                 id="name" 
                 placeholder="Nombre completo" 
-                className={inputClasses}
+                className={`${inputClasses} ${errors.name ? errorClasses : ''}`}
                 value={contactData.name}
                 onChange={handleContactChange}
               />
+              {errors.name && <p className="text-red-500 text-sm -mt-2 mb-3">{errors.name}</p>}
+              
               <input 
                 type="text" 
                 name="phone" 
                 id="phone" 
                 placeholder="Número de celular" 
-                className={inputClasses}
+                className={`${inputClasses} ${errors.phone ? errorClasses : ''}`}
                 value={contactData.phone}
                 onChange={handleContactChange}
               />
+              {errors.phone && <p className="text-red-500 text-sm -mt-2 mb-3">{errors.phone}</p>}
             </div>
 
             {/* Shipping */}
             <div className="bg-white p-4 rounded-xl shadow-lg">
               <h3 className="text-lg font-bold mb-3 text-gray-800">🚚 Escoge la Forma de Envío</h3>
+              
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div 
                   onClick={()=>setSelectedShippingMode(ShippingMethods.MRW)} 
@@ -333,9 +888,21 @@ export default function Cart() {
                 </div>
               </div>
               
+              {/* Shipping Method Error */}
+              {errors.shippingMethod && <p className="text-red-500 text-sm -mt-2 mb-3 font-medium">{errors.shippingMethod}</p>}
+              
               {/* Shipping method specific inputs */}
               <div className="p-3 border border-gray-200 rounded-lg bg-gray-50 transition-all duration-300">
-                { (selectedShippingMode === ShippingMethods.MRW) && <ShippingMRW /> }
+                { 
+                  (selectedShippingMode === ShippingMethods.MRW) && 
+                  <ShippingMRW 
+                      errors={{
+                          shippingState: errors.shippingState,
+                          shippingMunicipality: errors.shippingMunicipality,
+                          shippingAgencyAddress: errors.shippingAgencyAddress,
+                      }}
+                  />
+                }
                 { (selectedShippingMode === ShippingMethods.ZOOM) && <ShippingZoom /> }
                 {
                   selectedShippingMode === null && 
@@ -347,6 +914,7 @@ export default function Cart() {
             {/* Payment */}
             <div className="bg-white p-4 rounded-xl shadow-lg">
               <h3 className="text-lg font-bold mb-3 text-gray-800">💳 Escoge tu Método de Pago</h3>
+              
               <div className="grid grid-cols-2 gap-3">
                 {Object.values(PaymentMethods)
                   .filter(v => typeof v === 'number')
@@ -365,6 +933,9 @@ export default function Cart() {
                 }
               </div>
               
+              {/* Payment Method Error */}
+              {errors.paymentMethod && <p className="text-red-500 text-sm mt-3 font-medium">{errors.paymentMethod}</p>}
+
               {/* Selected payment instructions */}
               {selectedPaymentMethod !== null && (
                 <div className="mt-4 p-3 border border-gray-200 rounded-lg bg-yellow-50 text-gray-700">
@@ -386,8 +957,10 @@ export default function Cart() {
                   type="file" 
                   name="payment-proof" 
                   id="payment-proof" 
-                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" 
+                  // Apply error style if there's a paymentProof error
+                  className={`w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold ${errors.paymentProof ? 'file:bg-red-100 file:text-red-700 border-red-500' : 'file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100'} cursor-pointer border rounded-md p-1 transition-all`}
                 />
+                {errors.paymentProof && <p className="text-red-500 text-sm mt-2">{errors.paymentProof}</p>}
               </div>
             </div>
             
