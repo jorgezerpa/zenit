@@ -11,7 +11,7 @@ const useProductsStore = create<ProductsState>()((set) => ({
     id: "plb-hd-001", 
     name: "Heavy-Duty Doorway Pull-Up Bar", 
     price: 39.99,
-    images: ['images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png']    
+    images: ['images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png','images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png','images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png','images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png','images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png','images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png',]    
 },
 { 
     id: "pbd-pr-002", 

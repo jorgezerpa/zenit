@@ -46,12 +46,13 @@ export default function Home() {
             {/* images */}
             <div className="md:p-5 w-full flex flex-col-reverse md:flex-row">
               
-              <div className="w-full md:w-[100px] md:h-[500px] bg-[#F1F1F1] flex md:flex-col items-center gap-1">
+              {/* Image selector */}
+              <div className="w-full md:w-[100px] md:h-[500px] bg-[#F1F1F1] flex md:flex-col items-center gap-1 overflow-x-scroll md:overflow-x-hidden md:overflow-y-scroll">
                 {
                   product.images.map((img, i) => (
                     <div 
                       key={product.id + img} 
-                      className="w-[81px] h-[81px] bg-center bg-cover bg-no-repeat" 
+                      className="w-[81px] h-[81px] bg-center bg-cover bg-no-repeat shrink-0" 
                       style={{ backgroundImage: `url(${img})`, outline: i==selectedImage?"5px solid green":"" }}
                       onClick={()=>setSelectedImage(i)}  
                     >
