@@ -468,7 +468,16 @@ const STATES = [
   }
 ];
 
-export function ShippingZoom() {
+const errorClasses = "border-red-500 focus:ring-red-500";
+
+type ShippingErrors = {
+    shippingState: string;
+    shippingMunicipality: string;
+    shippingAgencyAddress: string;
+}
+
+// NOTE: You will need to ensure the parent (Cart) passes these errors like <ShippingMRW errors={errors} />
+export function ShippingZoom({ errors }: { errors: ShippingErrors }) {
     // 1. Get the store function directly
     const { addShippingData } = useShippingStore(); 
     
@@ -502,21 +511,11 @@ export function ShippingZoom() {
                 };
             }
             
-            // 🛑 FIX: Update the Zustand store immediately after calculating the new local state.
-            // This prevents the infinite loop caused by useEffect dependency array.
             addShippingData(newState);
 
             return newState;
         });
     };
-
-    // 🛑 REMOVE THE EFFECT: This is the source of the infinite loop.
-    // The store update is now handled inside handleChange.
-    /*
-    useEffect(() => {
-        shippingStore.addShippingData(shippingData);
-    }, [shippingData, shippingStore]);
-    */
 
     // Logic to find the municipalities for the currently selected state
     const selectedState = STATES.find(s => s.name === shippingData.state);
@@ -525,13 +524,18 @@ export function ShippingZoom() {
     // Determine if the municipality select should be disabled
     const isMunicipalityDisabled = shippingData.state === "";
 
+    // Determine error styling
+    const stateErrorClass = errors.shippingState ? errorClasses : '';
+    const municipalityErrorClass = errors.shippingMunicipality ? errorClasses : '';
+    const agencyAddressErrorClass = errors.shippingAgencyAddress ? errorClasses : '';
+
     return ( 
         <div>
             {/* State Select Input (Always Enabled) */}
             <select
                 name="state" 
                 id="state" 
-                className={selectClasses}
+                className={`${selectClasses} ${stateErrorClass}`}
                 value={shippingData.state}
                 onChange={handleChange}
             >
@@ -542,12 +546,14 @@ export function ShippingZoom() {
                     </option>
                 ))}
             </select>
+            {errors.shippingState && <p className="text-red-500 text-sm -mt-2 mb-3">{errors.shippingState}</p>}
+
 
             {/* Municipality Select Input (Conditionally Enabled) */}
             <select
                 name="municipality" 
                 id="municipality" 
-                className={`${selectClasses} ${isMunicipalityDisabled ? disabledClasses : ''}`}
+                className={`${selectClasses} ${isMunicipalityDisabled ? disabledClasses : ''} ${municipalityErrorClass}`}
                 value={shippingData.municipality}
                 onChange={handleChange}
                 disabled={isMunicipalityDisabled} // Disable if no state is selected
@@ -562,18 +568,21 @@ export function ShippingZoom() {
                     </option>
                 ))}
             </select>
+            {errors.shippingMunicipality && <p className="text-red-500 text-sm -mt-2 mb-3">{errors.shippingMunicipality}</p>}
 
-            {/* Agency Address Input (Stays the same) */}
+
+            {/* Agency Address Input */}
             <input 
                 type="text" 
                 name="agencyAddress" 
                 id="agency-number" 
                 placeholder="Direccion/Numero de agencia" 
-                className={inputClasses}
+                className={`${inputClasses} ${agencyAddressErrorClass}`}
                 value={shippingData.agencyAddress}
                 // We reuse the existing handleChange, but cast the event target to HTMLInputElement
                 onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>)}
             />
+            {errors.shippingAgencyAddress && <p className="text-red-500 text-sm -mt-2 mb-3">{errors.shippingAgencyAddress}</p>}
         </div> 
     );
 }

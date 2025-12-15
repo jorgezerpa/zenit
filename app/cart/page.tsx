@@ -529,6 +529,22 @@ export default function Cart() {
     shippingStore.clearShippingData()
   }, [selectedShippingMode])
 
+
+  // useEffect to listen changes on shippingStore, to remove errors when user modifies a specific field
+  useEffect(()=>{
+    const shippingData = shippingStore.shippingData;
+    if(!shippingData) return;
+    if(shippingData.state) {
+      setErrors(prev => ({ ...prev, shippingState: '' }))
+    }
+    if(shippingData.municipality) {
+      setErrors(prev => ({ ...prev, shippingMunicipality: '' }))
+    }
+    if(shippingData.agencyAddress) {
+      setErrors(prev => ({ ...prev, shippingAgencyAddress: '' }))
+    }
+  }, [shippingStore.shippingData])
+
   const products = cartStore.products.map(cartProduct => {
     const product = productsStore.products.find(p => p.id == cartProduct.id)
     if(!product) return null
@@ -853,7 +869,10 @@ export default function Cart() {
                 placeholder="Nombre completo" 
                 className={`${inputClasses} ${errors.name ? errorClasses : ''}`}
                 value={contactData.name}
-                onChange={handleContactChange}
+                onChange={(e) => {
+                  setErrors(prev => ({ ...prev, name: '' }))
+                  handleContactChange(e)
+                }}
               />
               {errors.name && <p className="text-red-500 text-sm -mt-2 mb-3">{errors.name}</p>}
               
@@ -864,7 +883,10 @@ export default function Cart() {
                 placeholder="Número de celular" 
                 className={`${inputClasses} ${errors.phone ? errorClasses : ''}`}
                 value={contactData.phone}
-                onChange={handleContactChange}
+                onChange={(e)=>{
+                  setErrors(prev => ({ ...prev, phone: '' }))
+                  handleContactChange(e)
+                }}
               />
               {errors.phone && <p className="text-red-500 text-sm -mt-2 mb-3">{errors.phone}</p>}
             </div>
@@ -875,13 +897,19 @@ export default function Cart() {
               
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div 
-                  onClick={()=>setSelectedShippingMode(ShippingMethods.MRW)} 
+                  onClick={()=>{
+                    setErrors(prev => ({ ...prev, shippingMethod: '' }))
+                    setSelectedShippingMode(ShippingMethods.MRW)
+                  }} 
                   className={getSelectionClasses(selectedShippingMode === ShippingMethods.MRW)}
                 >
                   MRW
                 </div>
                 <div 
-                  onClick={()=>setSelectedShippingMode(ShippingMethods.ZOOM)} 
+                  onClick={()=>{
+                    setErrors(prev => ({ ...prev, shippingMethod: '' }))
+                    setSelectedShippingMode(ShippingMethods.ZOOM)
+                  }} 
                   className={getSelectionClasses(selectedShippingMode === ShippingMethods.ZOOM)}
                 >
                   ZOOM
@@ -897,13 +925,21 @@ export default function Cart() {
                   (selectedShippingMode === ShippingMethods.MRW) && 
                   <ShippingMRW 
                       errors={{
-                          shippingState: errors.shippingState,
-                          shippingMunicipality: errors.shippingMunicipality,
-                          shippingAgencyAddress: errors.shippingAgencyAddress,
+                        shippingState: errors.shippingState,
+                        shippingMunicipality: errors.shippingMunicipality,
+                        shippingAgencyAddress: errors.shippingAgencyAddress,
                       }}
                   />
                 }
-                { (selectedShippingMode === ShippingMethods.ZOOM) && <ShippingZoom /> }
+                { (selectedShippingMode === ShippingMethods.ZOOM) && 
+                  <ShippingZoom 
+                      errors={{
+                        shippingState: errors.shippingState,
+                        shippingMunicipality: errors.shippingMunicipality,
+                        shippingAgencyAddress: errors.shippingAgencyAddress,
+                      }}
+                  /> 
+                }
                 {
                   selectedShippingMode === null && 
                   <p className="text-center text-gray-500 text-sm">Selecciona un método de envío para continuar.</p>
@@ -923,7 +959,10 @@ export default function Cart() {
                     return (
                       <div 
                         key={method}
-                        onClick={() => setSelectedPaymentMethod(method)} 
+                        onClick={() => {
+                          setErrors(prev => ({ ...prev, paymentMethod: '' }))
+                          setSelectedPaymentMethod(method)
+                        }} 
                         className={getSelectionClasses(selectedPaymentMethod === method)}
                       >
                         {getPaymentMethodName(method)}
@@ -953,6 +992,7 @@ export default function Cart() {
               <div className="mt-4">
                 <h4 className="text-md font-semibold mb-2">Comprobante de Pago</h4>
                 <input 
+                  onChange={()=>setErrors(prev => ({ ...prev, paymentProof: '' }))}
                   ref={paymentProofRef}
                   type="file" 
                   name="payment-proof" 
