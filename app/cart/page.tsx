@@ -508,6 +508,8 @@ export default function Cart() {
   const [selectedShippingMode, setSelectedShippingMode] = useState<ShippingMethods|null>(null)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethods|null>(null)
 
+  const [isLoading, setIsLoading] = useState(false)
+
   // error handling and sanitization
   const [errors, setErrors] = useState({
     name: '',
@@ -521,6 +523,8 @@ export default function Cart() {
     products: '',  
     total: '', // total to pay
   })
+
+  const [uploadError, setUploadError] = useState(false)
 
   useEffect(()=>{
     cartStore.initialLoad()
@@ -618,6 +622,7 @@ export default function Cart() {
   }
 
   const handleBuy = async () => {
+    setIsLoading(true)
     let errors = {
       name: '',
       phone: '',
@@ -706,6 +711,7 @@ export default function Cart() {
     // If any errors, stop the process
     if (Object.values(errors).some(error => error) || !paymentProofFile) {
       setErrors(errors);
+      setIsLoading(false)
       console.log("Validation errors:", errors);
       return;
     }
@@ -726,6 +732,8 @@ export default function Cart() {
 
       if (uploadError) {
         console.error("Supabase Storage Upload Error:", uploadError);
+        setIsLoading(false)
+        setUploadError(true)
         // TODO: Handle upload failure
         return;
       }
@@ -747,7 +755,7 @@ export default function Cart() {
         payment_method: checkoutData.payment.method,
         total: checkoutData.total,
         payment_proof_url: paymentProofUrl, // The URL we got from the upload
-        status: 'Pending Payment', // Initial status
+        status: 'Pending Payment check', // Initial status
         // an string with comma separated list of product ids
         products: checkoutData.items.map(item => item.id).join(','),
       };
@@ -763,6 +771,8 @@ export default function Cart() {
         // TODO: Handle DB insertion failure
         // IMPORTANT: If this fails, you should also DELETE the uploaded file!
         // await supabase.storage.from('payment_proofs').remove([`proofs/${fileName}`]);
+        setIsLoading(false)
+        setUploadError(true)
         try {
           await supabase.storage.from('payment_proofs').remove([path]);
         } catch (deletionError) {
@@ -774,6 +784,7 @@ export default function Cart() {
       const newOrderId = orderData.id;
       // 4. SUCCESS
       console.log("Checkout successful. Order ID:", newOrderId);
+      setIsLoading(false)
 
       // 5 . Clear cart and shipping data and redirect to thanks page
       cartStore.clear();
@@ -1009,16 +1020,58 @@ export default function Cart() {
             <div className="h-5"></div>
 
             {/* Botón de Comprar */}
-            <button
-              onClick={handleBuy}
-              className="w-full py-3 bg-green-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-green-600 transition-colors"
-            >
-              Confirmar Compra
-            </button>
+            {
+              !isLoading && (
+                <button
+                  onClick={handleBuy}
+                  className="w-full py-3 bg-green-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-green-600 transition-colors"
+                >
+                  Confirmar Compra
+                </button>
+              )
+            }
+            {
+              isLoading && (
+                <div className="">
+                  <div className="flex flex-col items-center justify-center h-full w-full">
+                    <div className="bg-white p-8 rounded-lg shadow-2xl flex flex-col items-center">
+                      <svg 
+                        className="animate-spin h-10 w-10 text-black mb-4" 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        fill="none" 
+                        viewBox="0 0 24 24"
+                      >
+                        <circle 
+                          className="opacity-25" 
+                          cx="12" 
+                          cy="12" 
+                          r="10" 
+                          stroke="#00C950" 
+                          strokeWidth="4"
+                        ></circle>
+                        <path 
+                          className="opacity-75" 
+                          fill="#00C950" 
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      <p className="text-xl font-semibold text-black">
+                        Finalizando tu compra
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )
+            }
+            
+
+
+
             
           </div>
         </div>
       </div>
+
     </div>
   );
 }
