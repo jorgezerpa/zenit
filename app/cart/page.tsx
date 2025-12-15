@@ -504,7 +504,7 @@ export default function Cart() {
   const shippingStore = useShippingStore()
   
   const paymentProofRef = useRef<HTMLInputElement>(null);
-  const [contactData, setContactData] = useState<{ name:string, phone: string }>({ name:"", phone: "" })
+  const [contactData, setContactData] = useState<{ name:string, phone: string, IDNumber: string, email:string }>({ name:"", phone: "", IDNumber: "", email: "" })
   const [selectedShippingMode, setSelectedShippingMode] = useState<ShippingMethods|null>(null)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethods|null>(null)
 
@@ -514,6 +514,8 @@ export default function Cart() {
   const [errors, setErrors] = useState({
     name: '',
     phone: '',
+    IDNumber: '',
+    email: "",
     shippingMethod: '',
     shippingState: '',
     shippingMunicipality: '',
@@ -623,9 +625,12 @@ export default function Cart() {
 
   const handleBuy = async () => {
     setIsLoading(true)
+    setUploadError(false)
     let errors = {
       name: '',
       phone: '',
+      IDNumber: '',
+      email: '',
       shippingMethod: '',
       shippingState: '',
       shippingMunicipality: '',
@@ -668,6 +673,8 @@ export default function Cart() {
 
     // Input validation 
     // name -> Max 50 chars
+    // idNumber -> should start with V or E (no camel sensitive) followed by any amount of numbers
+    // email -> valid email format
     // phone -> starts with any of 0414,0424,0416,0426,0412,0422 and has 7 numbers after such prefixes
     // shippingMethod -> should be "mrw" or "zoom"
     // shippingState -> Any of the 23 states or distrit capital of venezuela  
@@ -680,6 +687,8 @@ export default function Cart() {
     if (checkoutData.contact.name.length < 5) errors.name = "El nombre ingresado es muy corto (minimo 5 caracteres)";
     if (checkoutData.contact.name.length > 50) errors.name = "El nombre ingresado es muy largo (maximo 50 caracteres)";
     if (!/^0(414|424|416|426|412|422)\d{7}$/.test(checkoutData.contact.phone)) errors.phone = "El número de teléfono ingresado no es válido.";
+    if (!/^[VEve]\d+$/.test(checkoutData.contact.IDNumber)) errors.IDNumber = "El número de cédula ingresado no es válido. Debe comenzar con V o E seguido de números. ej: V12345678";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(checkoutData.contact.email)) errors.email = "El correo electrónico ingresado no es válido.";
     if (!checkoutData.shipping.method || !(checkoutData.shipping.method === "MRW" || checkoutData.shipping.method === "ZOOM")) errors.shippingMethod = "Método de envío no existente";
     if (!checkoutData.payment.method || !Object.values(PaymentMethods).includes(checkoutData.payment.method)) errors.paymentMethod = "Método de pago no existente";
     if (checkoutData.items.length === 0) errors.products = "No hay productos en el carrito.";
@@ -793,6 +802,21 @@ export default function Cart() {
   } 
       
 
+  if(cartStore.products.length === 0) {
+    return (
+      <div>
+        <TopBar />
+        <BackButton to="/" text="volver a la lista de productos"/>
+        
+        <div className="p-5">
+          <h2 className="text-xl font-bold">Tu carrito está vacío</h2>
+          <div className="h-5"></div>
+          <p className="text-gray-600">Agrega productos a tu carrito para verlos aquí.</p>
+        </div>
+      </div>
+    )
+  }
+
     
   return (
     <div>
@@ -887,6 +911,34 @@ export default function Cart() {
                 }}
               />
               {errors.name && <p className="text-red-500 text-sm -mt-2 mb-3">{errors.name}</p>}
+              
+              <input 
+                type="text" 
+                name="email" 
+                id="email" 
+                placeholder="email" 
+                className={`${inputClasses} ${errors.name ? errorClasses : ''}`}
+                value={contactData.email}
+                onChange={(e) => {
+                  setErrors(prev => ({ ...prev, email: '' }))
+                  handleContactChange(e)
+                }}
+              />
+              {errors.email && <p className="text-red-500 text-sm -mt-2 mb-3">{errors.email}</p>}
+              
+              <input 
+                type="text" 
+                name="IDNumber" 
+                id="IDNumber" 
+                placeholder="Cedula de identidad" 
+                className={`${inputClasses} ${errors.IDNumber ? errorClasses : ''}`}
+                value={contactData.IDNumber}
+                onChange={(e)=>{
+                  setErrors(prev => ({ ...prev, IDNumber: '' }))
+                  handleContactChange(e)
+                }}
+              />
+              {errors.IDNumber && <p className="text-red-500 text-sm -mt-2 mb-3">{errors.IDNumber}</p>}
               
               <input 
                 type="text" 
@@ -1022,12 +1074,24 @@ export default function Cart() {
             {/* Botón de Comprar */}
             {
               !isLoading && (
-                <button
-                  onClick={handleBuy}
-                  className="w-full py-3 bg-green-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-green-600 transition-colors"
-                >
-                  Confirmar Compra
-                </button>
+                <>
+                  <button
+                    onClick={handleBuy}
+                    className="w-full py-3 bg-green-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-green-600 transition-colors"
+                  >
+                    Confirmar Compra
+                  </button>
+                  {Object.values(errors).some(error => error) && (
+                    <p className="text-red-500 text-sm mt-2 text-center">
+                      Ups! Parece que hay algunos errores en los datos ingresados. Por favor, revisa los campos resaltados y corrígelos para realizar con tu compra.
+                    </p>
+                  )}
+                  {uploadError && (
+                    <p className="text-red-500 text-sm mt-2 text-center">
+                      Ocurrió un error al procesar tu compra. Por favor, intenta nuevamente.
+                    </p>
+                  )}
+                </>
               )
             }
             {
