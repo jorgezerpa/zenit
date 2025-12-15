@@ -2,6 +2,8 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cart";
+import Image from "next/image"; // Import Image
+import Link from "next/link"; // Import Link for wrapping the logo
 
 export function TopBar() {
     const router = useRouter()
@@ -17,8 +19,22 @@ export function TopBar() {
     return (  
       <div className="bg-black h-[81px] p-5 flex items-center fixed left-0 right-0 z-50">
         <div className="w-full flex justify-center items-center">
+          
           <div className="w-full"></div>
-          <div className="w-full"></div>
+
+          {/* 1. LOGO (Replaces the first empty div) */}
+          <div className="w-full flex justify-center items-center">
+            <Link href="/" className="cursor-pointer">
+              <Image 
+                src="/logo.png" 
+                alt="Store Logo" 
+                width={150} // Adjust width as needed for your design
+                height={50} // Adjust height to maintain aspect ratio
+                priority 
+                className="object-contain"
+              />
+            </Link>
+          </div>
 
           {/* Cart Icon and Bubble Container */}
           <div 
