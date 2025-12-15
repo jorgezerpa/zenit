@@ -16,6 +16,7 @@ import { Binance } from "@/components/paymentMethods/Binance";
 //
 import { supabase } from "@/lib/supabase";
 import { error } from "console";
+import { RenderUpload } from "@/components/RenderUpload";
 
 enum PaymentMethods {
   PagoMovil,
@@ -1002,6 +1003,7 @@ export default function Cart() {
                 />
                 {errors.paymentProof && <p className="text-red-500 text-sm mt-2">{errors.paymentProof}</p>}
               </div>
+              <RenderUpload fileInputRef={paymentProofRef} />
             </div>
             
             <div className="h-5"></div>
