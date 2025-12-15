@@ -806,7 +806,8 @@ export default function Cart() {
     return (
       <div>
         <TopBar />
-        <BackButton to="/" text="volver a la lista de productos"/>
+        <div className="h-[81px]" />
+        <BackButton to="/" text=""/>
         
         <div className="p-5">
           <h2 className="text-xl font-bold">Tu carrito está vacío</h2>
@@ -821,7 +822,8 @@ export default function Cart() {
   return (
     <div>
       <TopBar />
-      <BackButton to="/" text="volver a la lista de productos"/>
+      <div className="h-[81px]" />
+      <BackButton to="/" text=""/>
       
       <div className="p-5">
         <h2 className="text-xl font-bold">Tu carrito</h2>

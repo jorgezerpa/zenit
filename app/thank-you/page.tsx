@@ -17,6 +17,7 @@ export default function ThankYou() {
   return (
     <div>
       <TopBar />
+      <div className="h-[81px]" />
 
       {/* Main Content Container - Centered and Styled */}
       <div className="flex flex-col items-center justify-center p-5 min-h-[70vh] text-center">

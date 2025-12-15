@@ -15,11 +15,11 @@ export function TopBar() {
     }, [])
 
     return (  
-      <div className="bg-black h-[100px] p-5 flex items-center">
+      <div className="bg-black h-[81px] p-5 flex items-center fixed left-0 right-0 z-50">
         <div className="w-full flex justify-center items-center">
           <div className="w-full"></div>
           <div className="w-full"></div>
-          
+
           {/* Cart Icon and Bubble Container */}
           <div 
             className="w-full flex justify-end items-center cursor-pointer"

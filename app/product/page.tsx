@@ -29,7 +29,8 @@ export default function Home() {
     <div>
 
       <TopBar />
-      <BackButton to="/" text="volver a la lista de productos" />
+      <div className="h-[81px]" />
+      <BackButton to="/" text="" />
 
 
       {
