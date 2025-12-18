@@ -758,6 +758,8 @@ export default function Cart() {
       const orderInsertData = {
         contact_name: checkoutData.contact.name,
         contact_phone: checkoutData.contact.phone,
+        contact_email: checkoutData.contact.email,
+        contact_idNumber: checkoutData.contact.IDNumber,
         shipping_method: checkoutData.shipping.method,
         stimated_delivery_days: checkoutData.shipping.deliveryDays,
         shipping_data: checkoutData.shipping.specificData, // jsonb field
