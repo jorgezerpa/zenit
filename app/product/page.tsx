@@ -7,8 +7,9 @@ import { useCartStore } from "@/store/cart";
 import { Product } from "@/types/Product";
 import { useProductsStore } from "@/store/products";
 import { BackButton } from "@/components/backButton";
+import { Suspense } from "react";
 
-export default function Home() {
+function ProductPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const productId = searchParams.get('productId') as string
@@ -83,5 +84,15 @@ export default function Home() {
 
 
     </div>      
+  );
+}
+
+
+// 2. The main export just provides the Suspense boundary
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Cargando producto...</div>}>
+      <ProductPageContent />
+    </Suspense>
   );
 }
