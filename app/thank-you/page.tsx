@@ -40,8 +40,40 @@ export default function ThankYou() {
         </p>
 
         <p className="text-md text-gray-500 max-w-lg mb-10">
-          En breve recibirás un correo de confirmación con los detalles de tu orden. Si tienes alguna pregunta, no dudes en contactarnos.
+          En breve recibirás un correo de confirmación con los detalles de tu orden. Si tienes algun problema o pregunta, no dudes en contactarnos
         </p>
+
+        {/* Updated Social Links with Icons */}
+        <div className="flex gap-6 mb-12 items-center">
+          <a 
+            href="https://wa.me/584128762882" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="transition transform hover:scale-110"
+          >
+            <Image 
+              src="/images/socials/whatsapp.png" 
+              alt="WhatsApp" 
+              width={40} 
+              height={40} 
+              className="object-contain"
+            />
+          </a>
+          <a 
+            href="https://instagram.com/zenit_ven" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="transition transform hover:scale-110"
+          >
+            <Image 
+              src="/images/socials/instagram.png" 
+              alt="Instagram" 
+              width={40} 
+              height={40} 
+              className="object-contain"
+            />
+          </a>
+        </div>
 
         {/* Call to Action Button - Styled similarly to the 'Add to cart' button */}
         <Link href="/">
