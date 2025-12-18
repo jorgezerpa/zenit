@@ -14,6 +14,7 @@ export function Shipping() {
             {
             shippingLogos.map(l => (
                 <Image
+                key={"uniqueKeyIgvisor"+l}
                 className="dark:invert"
                 src={l}
                 alt="shipping logo"

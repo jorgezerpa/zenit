@@ -1,8 +1,4 @@
 'use client'
-import { useState, useEffect } from "react";
-import { useCheckoutStore } from "@/store/checkout"; 
-
-
 
 export function Binance() {
 

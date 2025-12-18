@@ -11,19 +11,14 @@ import { BackButton } from "@/components/backButton";
 export default function Home() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  let productId = searchParams.get('productId') as string
+  const productId = searchParams.get('productId') as string
 
   const cartStore = useCartStore() // use only to check if product is already on cart 
   const productstore = useProductsStore()
 
-  const [product, setProduct] = useState<null|Product>(null)
   const [selectedImage, setSelectedImage] = useState<number>(0)
-
-  useEffect(()=>{
-    // fetch product
-    const product = productstore.products.find(p => p.id === productId)
-    if(product) setProduct(product)
-  }, [productId])
+  
+  const product = productstore.products.find(p => p.id === productId) || null
 
   return (
     <div>

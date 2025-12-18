@@ -10,12 +10,11 @@ import { ShippingZoom } from "@/components/shippingZOOM";
 import { useShippingStore } from "@/store/shipping";
 import { PagoMovil } from "@/components/paymentMethods/PagoMovil";
 import { TransferenciaProvincial } from "@/components/paymentMethods/TransferenciaProvincial";
-import { TransferenciaMercantil } from "@/components/paymentMethods/TransferenciaMercantil";
-import { TransferenciaBanesco } from "@/components/paymentMethods/TransferenciaBanesco";
+// import { TransferenciaMercantil } from "@/components/paymentMethods/TransferenciaMercantil";
+// import { TransferenciaBanesco } from "@/components/paymentMethods/TransferenciaBanesco";
 import { Binance } from "@/components/paymentMethods/Binance";
 //
 import { supabase } from "@/lib/supabase";
-import { error } from "console";
 import { RenderUpload } from "@/components/RenderUpload";
 
 enum PaymentMethods {
@@ -626,7 +625,7 @@ export default function Cart() {
   const handleBuy = async () => {
     setIsLoading(true)
     setUploadError(false)
-    let errors = {
+    const errors = {
       name: '',
       phone: '',
       IDNumber: '',
@@ -726,9 +725,13 @@ export default function Cart() {
     }
 
     // 2. **Upload Payment Proof to Storage**
-      let paymentProofUrl = null;
+    let paymentProofUrl = null;
+    const uniqueId = crypto.randomUUID();
+    // eslint-disable-next-line react-hooks/purity
+    const timestamp = Date.now();
+    
       const fileName = 
-        `${Date.now()}-${checkoutData.contact.name}-${checkoutData.contact.phone}-${checkoutData.payment.method}-${checkoutData.total}-${Math.random().toString()}` // Unique file name
+        `${timestamp}-${checkoutData.contact.name}-${checkoutData.contact.phone}-${checkoutData.payment.method}-${checkoutData.total}-${uniqueId}` // Unique file name
         .replace(/\s+/g, '_'); // replace spaces with underscores
 
       // Storage path: bucket_name/folder/filename
