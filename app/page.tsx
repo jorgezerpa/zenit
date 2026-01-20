@@ -49,9 +49,13 @@ export default function Home() {
                     className="relative cursor-pointer overflow-hidden aspect-square"
                 >
                     {/* Badge Opcional */}
-                    <div className="absolute top-3 left-3 z-10 bg-black text-white text-[10px] font-bold px-2 py-1 uppercase tracking-widest rounded">
-                        Elite Gear
-                    </div>
+                    {
+                        product.tag && (
+                            <div className="absolute top-3 left-3 z-10 bg-black text-white text-[10px] font-bold px-2 py-1 uppercase tracking-widest rounded">
+                                { product.tag }
+                            </div>
+                        )
+                    }
 
                     <div 
                         className="w-full h-full bg-center bg-cover bg-no-repeat transition-transform duration-700 group-hover:scale-110" 
@@ -63,10 +67,10 @@ export default function Home() {
                 </div>
 
                 {/* Info Area */}
-                <div className="p-4 md:p-6 flex flex-col flex-grow">
+                <div className="p-4 md:p-6 flex flex-col grow">
                     <div 
                         onClick={()=>router.push(`/product?productId=${product.id}`)}
-                        className="cursor-pointer flex-grow"
+                        className="cursor-pointer grow"
                     >
                         <p className="text-gray-500 text-[10px] uppercase font-bold tracking-widest mb-1">Calistenia VZLA</p>
                         <h3 className="text-lg md:text-xl font-bold text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">

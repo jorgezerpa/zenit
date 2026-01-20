@@ -7,67 +7,49 @@ interface ProductsState {
 
 const useProductsStore = create<ProductsState>()((set) => ({
     products: [
-  { 
-    id: "plb-hd-001", 
-    name: "Heavy-Duty Doorway Pull-Up Bar", 
-    price: 39.99,
-    images: ['images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png','images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png','images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png','images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png','images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png','images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png',]    
-},
-{ 
-    id: "pbd-pr-002", 
-    name: "Portable Low Parallette Dip Bars (Pair)", 
-    price: 79.50,
-    images: ['images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png']    
-},
-{ 
-    id: "rgs-sl-003", 
-    name: "Olympic Gymnastic Rings with Numbered Straps", 
-    price: 54.95,
-    images: ['images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png']    
-},
-{ 
-    id: "rwc-md-004", 
-    name: "Multi-Function Wall Mount Pull-Up Station", 
-    price: 129.00,
-    images: ['images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png']    
-},
-{ 
-    id: "abw-rd-005", 
-    name: "Premium Steel Ab Wheel Roller", 
-    price: 24.99,
-    images: ['images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png']    
-},
-{ 
-    id: "pud-rv-006", 
-    name: "Resistance Band Set (5-Level)", 
-    price: 29.99,
-    images: ['images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png']    
-},
-{ 
-    id: "str-mat-007", 
-    name: "High-Density Foam Exercise Mat (6' x 4')", 
-    price: 45.00,
-    images: ['images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png']    
-},
-{ 
-    id: "hld-bl-008", 
-    name: "Hand Grip Strengthener (Adjustable 10-60kg)", 
-    price: 14.95,
-    images: ['images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png']    
-},
-{ 
-    id: "wvt-sd-009", 
-    name: "Adjustable Weighted Vest (20 lbs)", 
-    price: 99.99,
-    images: ['images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png']    
-},
-{ 
-    id: "plb-cm-010", 
-    name: "Ceiling Mount Gravity Boots for Inversion", 
-    price: 85.00,
-    images: ['images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png']    
-},
-] ,
+        { 
+            id: "paralletes-lg", 
+            name: "Barras paralelas grandes", 
+            description: "",
+            price: 140,
+            images: [
+                'images/products/parallettes-lg-1.png',
+                'images/products/parallettes-lg-2.png',
+            ],    
+            tag: "Mas vendido"
+        },
+        { 
+            id: "paralletes-md", 
+            name: "Barras paralelas medianas", 
+            price: 90,
+            images: [
+                'images/products/parallettes-md-1.png',
+                'images/products/parallettes-md-2.png',
+                'images/products/parallettes-md-3.png'
+            ]    
+        },
+        { 
+            id: "paralletes-sm", 
+            name: "Barras paralelas pequeñas", 
+            price: 60,
+            images: [
+                'images/products/parallettes-sm-1.png',
+                'images/products/parallettes-sm-2.png',
+            ]    
+        },
+        { 
+            id: "pullup-bar-corner", 
+            name: "Barra de dominadas para esquinas", 
+            price: 50,
+            images: ['images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png']    
+        },
+        { 
+            id: "olimpic-rings", 
+            name: "Anillas olimpicas de madera", 
+            price: 60,
+            images: ['images/homeHero/1.png', 'images/homeHero/2.png', 'images/homeHero/3.png']    
+        },
+    ],
 
 }))
 

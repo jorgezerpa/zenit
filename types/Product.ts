@@ -3,6 +3,8 @@ export interface Product {
     name: string
     price: number
     images: Array<string>
+    description?: string
+    tag?: string // tag displayed on the product card 
 }
 
 export interface CartProduct {
