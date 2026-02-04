@@ -4,6 +4,7 @@ export interface Product {
     price: number
     images: Array<string>
     description?: string
+    keypoints?: Array<[string, string]> // icon, text
     tag?: string // tag displayed on the product card 
 }
 

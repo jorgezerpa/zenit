@@ -1,3 +1,28 @@
+// si deseas continua en ws tu compra :
+// function test(){
+// const msg = `*Service Inquiry Request*
+
+// Hello, I am interested in:
+// - Premium Package
+// - Consulting Session
+// - Custom Development
+
+// To proceed, I have followed these steps:
+// 1. Checked your current availability
+// 2. Reviewed the pricing page
+// 3. Filled out this form
+
+// Looking forward to your reply!`
+//   return `https://wa.me/584128762882?text=${encodeURIComponent(msg)}`
+// }
+
+
+
+
+
+
+
+
 'use client'
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";

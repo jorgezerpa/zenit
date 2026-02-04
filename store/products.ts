@@ -10,13 +10,18 @@ const useProductsStore = create<ProductsState>()((set) => ({
         { 
             id: "paralletes-lg", 
             name: "Barras paralelas grandes", 
-            description: "",
+            description: "Diseñado para atletas de alto rendimiento. Acero reforzado con acabado en pintura electrostática para un agarre superior y resistencia al intemperie",
+            keypoints: [
+                ["💪", "Soporta hasta 250kg de peso/lastre."],    
+                ["📍", "Envíos asegurados por MRW / Zoom."],
+                ["🇻🇪", "Hecho en Venezuela para la élite."]    
+            ],
             price: 140,
             images: [
                 'images/products/parallettes-lg-1.png',
                 'images/products/parallettes-lg-2.png',
             ],    
-            tag: "Mas vendido"
+            tag: "Mas vendido",
         },
         { 
             id: "paralletes-md", 

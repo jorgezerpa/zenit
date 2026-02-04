@@ -72,7 +72,7 @@ export default function Home() {
                         onClick={()=>router.push(`/product?productId=${product.id}`)}
                         className="cursor-pointer grow"
                     >
-                        <p className="text-gray-500 text-[10px] uppercase font-bold tracking-widest mb-1">Calistenia VZLA</p>
+                        {/* <p className="text-gray-500 text-[10px] uppercase font-bold tracking-widest mb-1">Calistenia VZLA</p> */}
                         <h3 className="text-lg md:text-xl font-bold text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">
                             { product.name }
                         </h3>

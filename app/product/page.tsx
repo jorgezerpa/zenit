@@ -95,21 +95,18 @@ function ProductPageContent() {
               <div className="mt-8 space-y-4">
                 <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    {/* Aquí puedes meter una descripción real si el tipo Product la tiene */}
-                    Diseñado para atletas de alto rendimiento. Acero reforzado con acabado en pintura electrostática para un agarre superior y resistencia al intemperie.
+                    { product.description }
                   </p>
                 </div>
 
                 <ul className="space-y-2">
-                  <li className="flex items-center gap-2 text-sm text-gray-600">
-                    <span className="text-blue-600">💪</span> Soporta hasta 250kg de peso/lastre.
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-gray-600">
-                    <span className="text-blue-600">📍</span> Envíos asegurados por MRW / Zoom.
-                  </li>
-                  <li className="flex items-center gap-2 text-sm text-gray-600">
-                    <span className="text-blue-600">🇻🇪</span> Hecho en Venezuela para la élite.
-                  </li>
+                  {
+                    product.keypoints?.map(kp => (
+                      <li className="flex items-center gap-2 text-sm text-gray-600">
+                        <span className="text-blue-600">{kp[0]}</span> {kp[1]}
+                      </li>
+                    ))
+                  }
                 </ul>
               </div>
             </div>
