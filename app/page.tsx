@@ -1,6 +1,8 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react';
 import { useLangStore } from '@/store/lang';
+import { WalletOptions } from '@/components/WalletOptions';
+import { useConnection, useDisconnect, useEnsAvatar, useEnsName } from 'wagmi'
 
 // 1. Translation Object
 const translations = {
@@ -9,6 +11,7 @@ const translations = {
     worldCup: "World Cup 2026",
     groupPhase: "Group Phase",
     connectWallet: "Connect Wallet",
+    disconnectWallet: "Disconnect Wallet",
     win: "wins",
     draw: "Draw",
     knockoutTitle: "Knockout Road to NY/NJ",
@@ -28,6 +31,7 @@ const translations = {
     worldCup: "Copa Mundial 2026",
     groupPhase: "Fase de Grupos",
     connectWallet: "Conectar Billetera",
+    disconnectWallet: "Desconectar Billetera",
     win: "gana",
     draw: "Empate",
     knockoutTitle: "Camino a la Final NY/NJ",
@@ -49,11 +53,18 @@ const PAGE = () => {
 }
 
 const View = () => {
+  // 1. 
+  const { address, isConnected } = useConnection()
+  const { disconnect } = useDisconnect()
+  const { data: ensName } = useEnsName({ address })
+  const { data: ensAvatar } = useEnsAvatar({ name: ensName! })
+
   // 2. Access Language Store
   const { lang, setLang, getLang } = useLangStore();
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeSelection, setActiveSelection] = useState<any>(null);
+  const [showWalletOptions, setShowWalletOptions] = useState(false)
 
   // Helper to access current translations
   const t = translations[lang as keyof typeof translations];
@@ -235,9 +246,24 @@ function sortMatchesByDate(matches: any) {
               </div>
             )}
           </div>
-          <button className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-lg shadow-blue-900/20 active:scale-95">
-            {t.connectWallet}
+          
+          <button 
+            onClick={
+              () => { 
+                if(isConnected) { 
+                  disconnect(); 
+                  setShowWalletOptions(false) 
+                } else {
+                  setShowWalletOptions(true)
+                } 
+              }
+            } 
+            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-lg shadow-blue-900/20 active:scale-95">
+            {ensAvatar && <img alt="ENS Avatar" src={ensAvatar} />}
+            {address && <div>{ensName ? `${ensName} ${address.slice(0, 4)}...${address.slice(-2)}` : `${address.slice(0, 4)}...${address.slice(-2)}`}</div>}
+            {isConnected ? t.disconnectWallet : t.connectWallet }
           </button>
+        
         </div>
       </nav>
 
@@ -343,6 +369,19 @@ function sortMatchesByDate(matches: any) {
         onClose={() => setIsDrawerOpen(false)} 
         selection={activeSelection} 
       />
+
+      {
+        (showWalletOptions && !isConnected) && (
+          <div className='fixed top-0 bottom-0 left-0 right-0 bg-[rgba(0,0,0,.4)] flex justify-center items-center'>
+            <div className='bg-slate-800 p-5 rounded-2xl flex flex-col justify-center items-center gap-3'>
+              <div onClick={()=>setShowWalletOptions(false)}>X</div>
+              <WalletOptions />
+            </div>
+          </div>
+        )
+      }
+
+
     </div>
   );
 };
