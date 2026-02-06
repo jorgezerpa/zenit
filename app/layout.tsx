@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+//
+import { WAGMI_WRAPPER } from "@/wrappers/Wagmi";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Zenit",
-  description: "Equipamento de calistenia y street workout de alta calidad",
+  title: "Bet",
+  description: "Bet",
 };
 
 export default function RootLayout({
@@ -27,7 +29,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <WAGMI_WRAPPER>
+          {children}
+        </WAGMI_WRAPPER>
       </body>
     </html>
   );
