@@ -6,10 +6,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 // WAGMI CONFIG
 export const WAGMI_CONFIG = createConfig({
-  chains: [mainnet, sepolia],
+  chains: [
+    // mainnet, 
+    sepolia
+  ],
   transports: {
-    [mainnet.id]: http(),
-    [sepolia.id]: http(),
+    // [mainnet.id]: http(),
+    [sepolia.id]: http("https://sepolia.infura.io/v3/b26a78bcb38b4957a68b3cdc645c2547"),
   },
 })
 
