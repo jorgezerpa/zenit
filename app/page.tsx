@@ -24,7 +24,8 @@ const translations = {
     potentialWin: "Estimated Payout",
     placeBet: "Confirm & Place Bet",
     poolNote: "Note: Pool totals may shift before kickoff.",
-    balance: "Balance"
+    balance: "Balance",
+    connectWalletFromDrawer: "Please connect your wallet to place a bet"
   },
   ES: {
     myBets: "Mis Apuestas",
@@ -44,7 +45,8 @@ const translations = {
     potentialWin: "Ganancia Estimada",
     placeBet: "Confirmar Apuesta",
     poolNote: "Nota: Los pozos pueden variar antes del inicio.",
-    balance: "Saldo"
+    balance: "Saldo",
+    connectWalletFromDrawer: "Conecta tu billetera para hacer apuestas"
   }
 };
 
@@ -388,6 +390,7 @@ function sortMatchesByDate(matches: any) {
 
 const BetDrawer = ({ isOpen, onClose, selection }: { isOpen: boolean, onClose: () => void, selection: any }) => {
   const { lang } = useLangStore();
+  const { address, isConnected } = useConnection()
   const t = translations[lang as keyof typeof translations];
   const [amount, setAmount] = useState('');
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -488,14 +491,20 @@ const BetDrawer = ({ isOpen, onClose, selection }: { isOpen: boolean, onClose: (
             </div>
           </div>
 
-          <p className="text-[10px] text-center text-slate-500 font-medium px-4">
-            {t.poolNote}
-          </p>
 
-          <button className="w-full bg-blue-600 hover:bg-blue-500 py-5 rounded-2xl font-black text-lg shadow-[0_10px_20px_rgba(37,99,235,0.3)] transition-all active:scale-95 group overflow-hidden relative">
+          <button disabled={!isConnected} className={` ${isConnected?"cursor-pointer":"cursor-auto opacity-50"} w-full bg-blue-600 ${isConnected&&"hover:bg-blue-500"} py-5 rounded-2xl font-black text-lg shadow-[0_10px_20px_rgba(37,99,235,0.3)] transition-all active:scale-95 group overflow-hidden relative`}>
             <span className="relative z-10">{t.placeBet}</span>
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
           </button>
+
+          {
+            !isConnected && (
+              <p className="text-[14px] text-center text-slate-500 font-medium px-4">
+                {t.connectWalletFromDrawer}
+              </p>
+            )
+          }
+
         </div>
       </div>
     </>
