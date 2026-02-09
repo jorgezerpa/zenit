@@ -2,9 +2,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLangStore } from '@/store/lang';
 import { WalletOptions } from '@/components/WalletOptions';
-import { useConnection, useDisconnect } from 'wagmi'
+import { useConnection, useDisconnect, useChainId, useChains } from 'wagmi'
 import { translations } from '@/translations/WorldCup';
 import { BetDrawer } from '@/components/Drawer';
+import { WAGMI_CONFIG } from '@/wrappers/Wagmi';
 
 const PAGE = () => {
   // 1. 
@@ -17,6 +18,10 @@ const PAGE = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeSelection, setActiveSelection] = useState<any>(null);
   const [showWalletOptions, setShowWalletOptions] = useState(false)
+  // 
+  const chainId = useChainId()
+  const chains = useChains({ config:WAGMI_CONFIG })
+  const currentChain = chains.find(c => c.id == chainId) // this is supposed to never be -1 (@audit should I add a handler for this to avoid breaks?)
 
   // Helper to access current translations
   const t = translations[lang as keyof typeof translations];
@@ -197,6 +202,10 @@ function sortMatchesByDate(matches: any) {
                 </button>
               </div>
             )}
+          </div>
+          
+          <div className="relative">
+            { currentChain?.name }
           </div>
           
           <button 

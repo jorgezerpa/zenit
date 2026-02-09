@@ -10,11 +10,11 @@ const projectId = 'f30c736e32326da888f5f24dc34c1c3f'
 // WAGMI CONFIG
 export const WAGMI_CONFIG = createConfig({
   chains: [
-    mainnet, 
+    // mainnet, 
     sepolia
   ],
   transports: {
-    [mainnet.id]: http("https://mainnet.infura.io/v3/b26a78bcb38b4957a68b3cdc645c2547"),
+    // [mainnet.id]: http("https://mainnet.infura.io/v3/b26a78bcb38b4957a68b3cdc645c2547"),
     [sepolia.id]: http("https://sepolia.infura.io/v3/b26a78bcb38b4957a68b3cdc645c2547"),
   },
    connectors: [
