@@ -6,6 +6,7 @@ import { useConnection, useDisconnect, useChainId, useChains } from 'wagmi'
 import { translations } from '@/translations/WorldCup';
 import { BetDrawer } from '@/components/Drawer';
 import { WAGMI_CONFIG } from '@/wrappers/Wagmi';
+import type { OutcomeSelection } from '@/types/OutcomeSelection';
 
 const PAGE = () => {
   // 1. 
@@ -16,7 +17,7 @@ const PAGE = () => {
   const { lang, setLang, getLang } = useLangStore();
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [activeSelection, setActiveSelection] = useState<any>(null);
+  const [activeSelection, setActiveSelection] = useState<OutcomeSelection|null>(null);
   const [showWalletOptions, setShowWalletOptions] = useState(false)
   // 
   const chainId = useChainId()
@@ -152,9 +153,10 @@ function sortMatchesByDate(matches: any) {
   });
 }
 
-  const handleBetClick = (match: any, selectionLabel: string) => {
+  const handleBetClick = (match: any, outcome: number, selectionLabel: string) => {
     setActiveSelection({
       matchId: match.id,
+      outcome, // 1 teamA wins, 2 teamB wins, 3 draw
       matchName: `${match.teamA} vs ${match.teamB}`,
       label: selectionLabel
     });
@@ -259,22 +261,25 @@ function sortMatchesByDate(matches: any) {
                     { 
                       label: `${match.teamA} ${t.win}`, 
                       base: "bg-blue-500/10 border-blue-500/20 text-blue-100",
-                      hover: "hover:bg-blue-600 hover:border-blue-400 hover:shadow-[0_0_15px_rgba(37,99,235,0.3)]" 
+                      hover: "hover:bg-blue-600 hover:border-blue-400 hover:shadow-[0_0_15px_rgba(37,99,235,0.3)]",
+                      outcome: 1,
                     },
                     { 
                       label: t.draw, 
                       base: "bg-slate-500/10 border-slate-700 text-slate-100",
-                      hover: "hover:bg-slate-600 hover:border-slate-400 hover:shadow-[0_0_15px_rgba(71,85,105,0.3)]" 
+                      hover: "hover:bg-slate-600 hover:border-slate-400 hover:shadow-[0_0_15px_rgba(71,85,105,0.3)]",
+                      outcome: 3
                     },
                     { 
                       label: `${match.teamB} ${t.win}`, 
                       base: "bg-indigo-500/10 border-indigo-500/20 text-indigo-100",
-                      hover: "hover:bg-indigo-600 hover:border-indigo-400 hover:shadow-[0_0_15px_rgba(79,70,229,0.3)]" 
+                      hover: "hover:bg-indigo-600 hover:border-indigo-400 hover:shadow-[0_0_15px_rgba(79,70,229,0.3)]",
+                      outcome: 2
                     }
                   ].map((opt, i) => (
                     <button 
                       key={i} 
-                      onClick={() => handleBetClick(match, opt.label)}
+                      onClick={() => handleBetClick(match, opt.outcome, opt.label)}
                       className={`relative py-4 rounded-2xl border transition-all duration-300 active:scale-95 group overflow-hidden ${opt.base} ${opt.hover}`}
                     >
                       <span className="block text-[9px] font-bold opacity-60 group-hover:opacity-100 group-hover:text-white uppercase mb-1 transition-all">
@@ -327,7 +332,7 @@ function sortMatchesByDate(matches: any) {
         // isOpen={isDrawerOpen} 
         isOpen={isDrawerOpen} 
         onClose={() => setIsDrawerOpen(false)} 
-        selection={activeSelection} 
+        selection={activeSelection as OutcomeSelection} 
       />
 
       {

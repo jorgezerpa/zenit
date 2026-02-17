@@ -3,13 +3,36 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLangStore } from '@/store/lang';
 import { useConnection } from 'wagmi'
 import { translations } from '@/translations/Drawer';
+import type { OutcomeSelection } from '@/types/OutcomeSelection';
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { ABI } from '@/ABIs/ParimutuelSportsBetting'
+import { type UseWriteContractParameters } from 'wagmi'
+import { parseEther } from 'viem'
 
-export const BetDrawer = ({ isOpen, onClose, selection }: { isOpen: boolean, onClose: () => void, selection: any }) => {
+export const BetDrawer = ({ isOpen, onClose, selection }: { isOpen: boolean, onClose: () => void, selection: OutcomeSelection }) => {
   const { lang } = useLangStore();
-  const { isConnected } = useConnection()
+  const { address, isConnected } = useConnection()
   const t = translations[lang as keyof typeof translations];
   const [amount, setAmount] = useState('');
   const drawerRef = useRef<HTMLDivElement>(null);
+
+  const [showToast, setShowToast] = useState(false);
+  
+  const writeContract = useWriteContract()
+  const { data: hash, error, isPending } = writeContract;
+  // 2. Setup Transaction Watcher Hook
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  // Handle Toast Visibility based on Wagmi states
+  useEffect(() => {
+    if (isPending || isConfirming || isConfirmed || error) {
+      setShowToast(true);
+    }
+  }, [isPending, isConfirming, isConfirmed, error]);
+
+
 
   // Close on outside click
   useEffect(() => {
@@ -25,6 +48,29 @@ export const BetDrawer = ({ isOpen, onClose, selection }: { isOpen: boolean, onC
   if (!selection) return null;
 
   const estimatedWin = amount ? (parseFloat(amount) * 1.85).toFixed(2) : "0.00"; // Mock multiplier
+
+  const handleBet = () => {
+    writeContract.mutate({ 
+          abi: ABI,
+          address: '0xC55377aAf5E8C57D23D1847a1FF616A924dbBEEF',
+          functionName: 'placeBet',
+          args: [
+            BigInt(selection.matchId),
+            BigInt(selection.outcome)
+          ],
+          value: parseEther(amount),
+
+       })
+  }
+
+  const getToastContent = () => {
+    if (isPending || isConfirming) return { msg: "Transaction in progress...", color: "border-blue-500 text-blue-400", loading: true };
+    if (isConfirmed) return { msg: "Transaction succeeds!", color: "border-emerald-500 text-emerald-400", loading: false };
+    if (error) return { msg: "Transaction failed", color: "border-red-500 text-red-400", loading: false };
+    return null;
+  };
+
+  const toast = getToastContent();
 
   return (
     <>
@@ -108,7 +154,7 @@ export const BetDrawer = ({ isOpen, onClose, selection }: { isOpen: boolean, onC
           </div>
 
 
-          <button disabled={!isConnected} className={` ${isConnected?"cursor-pointer":"cursor-auto opacity-50"} w-full bg-blue-600 ${isConnected&&"hover:bg-blue-500"} py-5 rounded-2xl font-black text-lg shadow-[0_10px_20px_rgba(37,99,235,0.3)] transition-all active:scale-95 group overflow-hidden relative`}>
+          <button onClick={handleBet} disabled={!isConnected} className={` ${isConnected?"cursor-pointer":"cursor-auto opacity-50"} w-full bg-blue-600 ${isConnected&&"hover:bg-blue-500"} py-5 rounded-2xl font-black text-lg shadow-[0_10px_20px_rgba(37,99,235,0.3)] transition-all active:scale-95 group overflow-hidden relative`}>
             <span className="relative z-10">{t.placeBet}</span>
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
           </button>
@@ -123,6 +169,22 @@ export const BetDrawer = ({ isOpen, onClose, selection }: { isOpen: boolean, onC
 
         </div>
       </div>
+
+      {showToast && toast && (
+        <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-4 bg-slate-900 border-2 ${toast.color} px-6 py-4 rounded-2xl shadow-2xl transition-all animate-in fade-in slide-in-from-bottom-4`}>
+          {toast.loading && (
+            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+          )}
+          <span className="font-bold text-sm uppercase tracking-wider">{toast.msg}</span>
+          <button 
+            onClick={() => setShowToast(false)}
+            className="ml-2 p-1 hover:bg-white/10 rounded-lg transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+      )}
+
     </>
   );
 };

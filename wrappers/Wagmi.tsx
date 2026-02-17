@@ -1,6 +1,6 @@
 'use client'
 import { createConfig, http, WagmiProvider } from 'wagmi'
-import { mainnet, sepolia } from 'wagmi/chains'
+import { mainnet, sepolia, localhost } from 'wagmi/chains'
 import { ReactNode } from 'react' // 1. Import ReactNode
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { injected, metaMask, safe, walletConnect } from 'wagmi/connectors'
@@ -12,10 +12,12 @@ export const WAGMI_CONFIG = createConfig({
   chains: [
     // mainnet, 
     sepolia
+    // localhost
   ],
   transports: {
     // [mainnet.id]: http("https://mainnet.infura.io/v3/b26a78bcb38b4957a68b3cdc645c2547"),
     [sepolia.id]: http("https://sepolia.infura.io/v3/b26a78bcb38b4957a68b3cdc645c2547"),
+    // [localhost.id]: http("http://127.0.0.1:8545")
   },
    connectors: [
     // injected({target:"metaMask"}),
